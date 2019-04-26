@@ -1,0 +1,308 @@
+package hemlock;
+
+import java.util.Scanner;
+
+public class CharacterCreation {
+	
+	static Scanner in = new Scanner(System.in);
+	
+	//================================================================================
+    // Character creation
+    //================================================================================
+		
+	public static Scene createCharacter(Scene scene) {
+		Girl player = scene.getScenePlayer();
+		player.setPlayer();
+		
+				TextDemo.print("\n\nWould you like to create your own character, or would you prefer to choose a preset? Type 'new character' to create your own character, or type 'preset' for a preset.");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.equals("new character") || input.equals("n")){
+				scene = CharacterCreation.chooseFurMode(scene);
+				scene = CharacterCreation.chooseGainMode(scene);
+				player = CharacterCreation.name(player);
+				player = CharacterCreation.lastName(player);
+				player = CharacterCreation.race(player);
+				player = CharacterCreation.skinColour(player);
+				player = CharacterCreation.bodyType(player);
+				player = CharacterCreation.hairColour(player);
+				player = CharacterCreation.hairType(player);
+				player = CharacterCreation.playerClass(player);
+				player = CharacterCreation.initialiseStats(player);
+				player = CharacterCreation.chooseClub(player);
+				player.setPlayerHouse();
+				entered = true;	
+			} else if (input.equals("preset") || input.equals("p")) {
+					Dialogue.presetList();
+				 	input = in.nextLine().toLowerCase();		
+				 	if(input.length() > 0) {
+				 		player.setPlayer();
+				 		//entered = player.choosePreset(input);
+				 	} else if (input.equals("random") || input.equals("r")) {
+				 		
+				 	} else {
+						
+					}
+			} else {
+				TextDemo.print("\n\nPlease enter either 'new character' to create a new character, or 'preset' to choose a preset.");
+			}
+		}
+		scene.setScenePlayer(player);
+		Dialogue.creationOverview(player);
+		return scene;
+	}
+	
+	//================================================================================
+    // Choosing modes
+    //================================================================================
+	
+	//for the following two functions, the variable 'player' is used to avoid having to retool
+	//NOTE: SHOULD BE FIXED AT SOME POINT
+	
+	public static Scene chooseFurMode(Scene player) {
+		
+		TextDemo.print("\n\nWould you like to play as a human/monster girl character (input 'human'), or a fur character (input 'fur')"
+				+ "\n\tThis will also impact the other characters you will encounter.");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.equals("fur") || input.equals("f")){
+				player.setFurMode(true);
+				entered = true;
+				return player;
+			} else if (input.equals("human") || input.equals("h")){
+				player.setFurMode(false);
+				entered = true;
+				return player;
+			} else {
+				TextDemo.print("\n\nPlease choose your mode!");
+			}
+		}
+		return player;
+	}
+	
+	public static Scene chooseGainMode(Scene player) {	
+		TextDemo.print("\n\nWould you like to play with weight gain enabled (input 'weight gain') or with weight gain disabled (input 'standard')"
+				+ "\n\tThis will also impact the other characters you will encounter.\n");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.equals("weight gain") || input.equals("w")){
+				player.setGainMode(true);
+				entered = true;
+				return player;
+			} else if (input.equals("standard") || input.equals("s")){
+				player.setGainMode(false);
+				entered = true;
+				return player;
+			}  else {
+				TextDemo.print("\n\nPlease choose your mode!");
+			}
+		}
+		return player;
+		
+	}
+	
+	//================================================================================
+    // Character details
+    //================================================================================
+	
+	public static Girl name(Girl player) {
+		TextDemo.print("\tEnter your first name (with a capital letter at the beginning, please): ");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine();
+			if (input.length()>=2) {
+				player.setPlayerName(input);
+				entered = true;
+			} else {
+				TextDemo.print("\nThat's too short for a name! Please try again. Enter your name:");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl lastName(Girl player) {
+		TextDemo.print("\tNow enter your last name (with a capital letter at the beginning, please). \nIf your character does not have a last name, input 'none':");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine();
+			if (input.length()>=2 && input.equals("none") == false) {
+				player.setPlayerLastName(input);
+				TextDemo.print("\tYour full name is " + player.getPlayerName() + " " + player.getPlayerLastName() + ".");
+				entered = true;
+			} else if (input.equals("none")){
+				TextDemo.print("\tYour name is " + player.getPlayerName() + ".");
+				entered = true;
+			} else {
+				TextDemo.print("\nThat's too short for a name! Please try again. Enter your name: ");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl race(Girl player) {
+		TextDemo.print("\nWhat is your race? (human, neko, naga, etc). "
+				+ "\n\tEnter your race (in lower case, please): ");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.length()>=2) {
+				player.setPlayerRace(input);
+				TextDemo.print("\tYou are a " + input + ".");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\nThat's too short for a race name! Please try again.");
+			}
+		}
+		return player;
+	}
+	
+	//================================================================================
+    // Character colours/types
+    //================================================================================
+	
+	public static Girl skinColour(Girl player) {
+		TextDemo.print("\nNow onto your skin colour (pale, dark, tanned, purple, etc.). "
+				+ "\n\tEnter your skin colour (in lower case, please): ");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.length()>=2) {
+				player.setPlayerSkinColour(input);
+				TextDemo.print("\tYou have " + input + " skin.");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\nThat's too short for a skin colour!"
+						+ "\nEnter your skin colour (in lower case, please): ");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl hairColour(Girl player) {
+		TextDemo.print("\nWhat colour is your hair (blonde, brown, black, rainbow, etc.)?"
+				+ "\n\tEnter your hair colour (in lower case, please):");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.length()>=2) {
+				player.setPlayerHairColour(input);
+				TextDemo.print("\nYou have " + input + " hair.");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\nThat's too short for a hair colour! Please try again."
+						+ "\n\tEnter your hair colour (in lower case, please):");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl hairType(Girl player) {
+		TextDemo.print("\nWhat style is your hair? (short, long, wavy, in a ponytail, in a bun etc.)"
+	               + "\n\tEnter your hair style (in lower case please):");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.length()>=2) {
+				player.setPlayerHairType(input);
+				TextDemo.print("\nYour hair is " + input + ".");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\nThat's too short for a hair type! Please try again."
+						+ "\n\tEnter your hair style (in lower case please):");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl chooseClub(Girl player) {
+		TextDemo.print("\n\nChoose what your character is most interested in. This will determine some potential scenes."
+				+ "\n\tChoose from any of these options: 'Drama', 'Music', 'Swimming', 'Track', 'Volleyball', 'Cheerleading', 'Writing', 'Technology' or 'Slacker'"
+				+ "\n\t Some notes:"
+				+ "\n\t\t These clubs determine what your characters interests are, and where they might end up during a day."
+				+ "\n\t\t These are nowhere as important as the classes, but it's good flavour nonetheless.");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.equals("drama") || input.equals("music") || input.equals("swimming") || input.equals("track") || input.equals("cheerleading") || input.equals("writing") || input.equals("technology") || input.equals("slacker") ) {
+				player.setPlayerClub(input);
+				TextDemo.print("\nYou have chosen " + input + ".");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\n You must choose a named interest. Enter an interest name: "
+						+ "\n\t Remember, 'Drama', 'Music', 'Swimming', 'Track', 'Volleyball', 'Cheerleading', 'Writing', 'Technology' and 'Slacker'");
+			}
+		}
+		return player;
+	}
+	
+	//================================================================================
+    // Body Type/other weight gain
+    //================================================================================
+	
+	public static Girl bodyType(Girl player) {
+		TextDemo.print("\nWhat is your body shape (curvy, slim, buxom, very buxom, etc)?"
+					+ "\n\tEnter your body shape (in lower case, please): ");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.length()>=2) {
+				player.setPlayerBodyType(input);
+				TextDemo.print("\tYour body is " + input + ".");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\nThat's too short for a body type! Please try again."
+						+ "\n\tEnter your body shape (in lower case, please): ");
+			}
+		}
+		return player;
+	}	
+	
+	//================================================================================
+    // Player stats
+    //================================================================================
+	
+	public static Girl playerClass(Girl player) {
+		TextDemo.print("\n\nChoose your class. "
+				+ "\n\tChoose one of these classes and type it below: \n\t 'Preppy', 'Chilled', 'Nerdy' or 'Bully' \n"
+				+ "\n\t Some notes:"
+				+ "\n\t\t Preppy is a social-focused character, talking themselves into and out of situations."
+				+ "\n\t\t Chilled is a jack of all trades, and their luck does most of the hard work for them."
+				+ "\n\t\t Nerdy is the smartest and most perceptive, though don't have a way with their words."
+				+ "\n\t\t Bullies know how to make trouble and avoid it, too. The strongest of the bunch.");
+		boolean entered = false;
+		while(entered == false) {
+			String input = in.nextLine().toLowerCase();
+			if (input.equals("preppy") || input.equals("chilled") || input.equals("nerdy") || input.equals("bully") ) {
+				player.setPlayerClass(input);
+				TextDemo.print("\nYou have chosen " + input + ".");
+				entered = true;
+				input = "";
+			} else {
+				TextDemo.print("\n You must choose a named class. Enter a class name."
+						+ "\nRemember, 'Preppy', 'Chilled', 'Nerdy' and 'Bully'");
+			}
+		}
+		return player;
+	}
+	
+	public static Girl initialiseStats(Girl player) {
+		String playerClass = player.getPlayerClass();
+		switch (playerClass) {
+		case "preppy": player.setCharisma(5); player.setIntelligence(3); player.setLuck(1); player.setPerception(4); player.setStrength(2); break;
+		case "chilled": player.setCharisma(4); player.setIntelligence(2); player.setLuck(5); player.setPerception(1); player.setStrength(3); break;
+		case "nerdy": player.setCharisma(2); player.setIntelligence(5); player.setLuck(3); player.setPerception(4); player.setStrength(1); break;
+		case "bully": player.setCharisma(3); player.setIntelligence(2); player.setLuck(1); player.setPerception(4); player.setStrength(5); break;	
+		}
+		return player;
+	}			
+}
+

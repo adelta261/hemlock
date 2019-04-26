@@ -1,0 +1,332 @@
+package hemlock;
+
+import java.util.Scanner;
+
+public class CharacterCreation
+{
+	static Scanner in = new Scanner(System.in);
+
+	// ================================================================================
+	// Character creation
+	// ================================================================================
+
+	public static void createCharacter()
+	{
+		promptEnableFur();
+		promptEnableWeightGain();
+
+		Girl player = new Girl();
+		
+		while (true)
+		{
+			TextDemo.print("Would you like to create a custom character, or would you prefer a random one? (custom, random)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.equals("custom") || input.equals("c"))
+			{
+				player.randomizePlayer();
+				
+				promptFirstName(player);
+				promptLastName(player);
+				promptRace(player);
+				promptSkinColour(player);
+				promptBodyType(player);
+				promptHairColour(player);
+				promptHairstyle(player);
+				promptClass(player);
+				promptClub(player);
+				
+				break;
+			}
+			else if (input.equals("random") || input.equals("r"))
+			{
+				player.randomizePlayer();
+				
+				break;
+			}
+			else
+			{
+				TextDemo.print("You must choose from the provided options.");
+			}
+		}
+		
+		Game.world.setScenePlayer(player);
+		Dialogue.creationOverview(player);
+		
+		Game.world.fillLocations();
+		Game.world.populateWorld(100, 20);
+	}
+
+	// ================================================================================
+	// Choosing modes
+	// ================================================================================
+
+	// for the following two functions, the variable 'player' is used to avoid
+	// having to retool
+	// NOTE: SHOULD BE FIXED AT SOME POINT
+
+	private static void promptEnableFur()
+	{
+		while (true)
+		{
+			TextDemo.print("Would you like to enable furry characters? (yes, no)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.equals("yes") || input.equals("y"))
+			{
+				Game.world.setFurMode(true);
+				break;
+			}
+			else if (input.equals("no") || input.equals("n"))
+			{
+				Game.world.setFurMode(false);
+				break;
+			}
+			else
+			{
+				TextDemo.print("You must choose from the provided options.");
+			}
+		}
+	}
+
+	private static void promptEnableWeightGain()
+	{
+		while (true)
+		{
+			TextDemo.print("Would you like to enable weight gain? (yes, no)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.equals("yes") || input.equals("y"))
+			{
+				Game.world.setGainMode(true);
+				break;
+			}
+			else if (input.equals("no") || input.equals("n"))
+			{
+				Game.world.setGainMode(false);
+				break;
+			}
+			else
+			{
+				TextDemo.print("You must choose from the provided options.");
+			}
+		}
+
+	}
+
+	// ================================================================================
+	// Character details
+	// ================================================================================
+
+	private static void promptFirstName(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("Enter your first name:");
+			
+			String input = in.nextLine().trim();
+			if (input.length() >= 2)
+			{
+				player.setGirlName(input.substring(0, 1).toUpperCase() + input.substring(1));
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your first name must be at least two letters long");
+			}
+		}
+	}
+
+	private static void promptLastName(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("Enter your last name (or 'none' for no last name):");
+			
+			String input = in.nextLine().trim();
+			if (input.equals("none"))
+			{
+				TextDemo.print("Your name is " + player.getGirlName() + ".");
+				break;
+			}
+			else if (input.length() >= 2)
+			{
+				player.setGirlLastName(input.substring(0, 1).toUpperCase() + input.substring(1));
+				
+				TextDemo.print("Your full name is " + player.getGirlName() + " " + player.getGirlLastName() + ".");
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your last name must be at least two letters long (or 'none').");
+			}
+		}
+	}
+
+	private static void promptRace(Girl player)
+	{
+		if (Game.world.getFurMode())
+		{
+			while (true)
+			{
+				TextDemo.print("What is your student's race? (human, neko, naga, etc.)");
+				
+				String input = in.nextLine().trim().toLowerCase();
+				if (input.length() >= 2)
+				{
+					player.setGirlRace(input);
+					TextDemo.print("You are a " + input + ".");
+					break;
+				}
+				else
+				{
+					TextDemo.print("Race names must be at least two letters long.");
+				}
+			}
+		}
+		else
+		{
+			player.setGirlRace("human");
+		}
+	}
+
+	// ================================================================================
+	// Character colours/types
+	// ================================================================================
+
+	private static void promptSkinColour(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("What is your student's skin colour? (pale, dark, tanned, purple, etc.)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.length() >= 2)
+			{
+				player.setGirlSkinColour(input);
+				TextDemo.print("You have " + input + " skin.");
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your skin color must be at least two letters long.");
+			}
+		}
+	}
+
+	private static void promptHairColour(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("What colour is your hair? (blonde, brown, black, rainbow, etc.)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.length() >= 2)
+			{
+				player.setGirlHairColour(input);
+				TextDemo.print("You have " + input + " hair.");
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your hair colour must be at least two letters long.");
+			}
+		}
+	}
+
+	private static void promptHairstyle(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("What style is your hair? (short, long, wavy, in a ponytail, in a bun etc.)");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.length() >= 2)
+			{
+				player.setGirlHairType(input);
+				TextDemo.print("Your hair is " + input + ".");
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your hair style must be at least two letters long.");
+			}
+		}
+	}
+
+	private static void promptClub(Girl player)
+	{
+		String clubList = Girl.listOptions(Girl.girlClub);
+		while (true)
+		{
+			TextDemo.print("Choose what your character is most interested in from the following options:\n" + clubList);
+					
+			String input = in.nextLine().trim().toLowerCase();
+			if (Girl.girlClub.indexOf(input) >= 0)
+			{
+				player.setGirlClub(input);
+				TextDemo.print("You have chosen " + input + ".");
+				break;
+			}
+			else
+			{
+				TextDemo.print("You must choose from the provided options.");
+			}
+		}
+	}
+
+	// ================================================================================
+	// Body Type/other weight gain
+	// ================================================================================
+
+	private static void promptBodyType(Girl player)
+	{
+		while (true)
+		{
+			TextDemo.print("What is your body shape (curvy, slim, buxom, very buxom, etc)?");
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (input.length() >= 2)
+			{
+				player.setGirlBodyType(input);
+				TextDemo.print("Your body is " + input + ".");
+				break;
+			}
+			else
+			{
+				TextDemo.print("Your body type must have at least two letters in it.");
+			}
+		}
+	}
+
+	// ================================================================================
+	// Player stats
+	// ================================================================================
+
+	private static void promptClass(Girl player)
+	{
+		String classList = Girl.listOptions(Girl.girlClasses);
+		
+				//+ "\n\t Some notes:"
+				//+ "\n\t\t Preppy is a social-focused character, talking themselves into and out of situations."
+				//+ "\n\t\t Chilled is a jack of all trades, and their luck does most of the hard work for them."
+				//+ "\n\t\t Nerdy is the smartest and most perceptive, though don't have a way with their words."
+				//+ "\n\t\t Bullies know how to make trouble and avoid it, too. The strongest of the bunch.");
+		while (true)
+		{
+			TextDemo.print("Choose your overall style from the following options:\n" + classList);
+			
+			String input = in.nextLine().trim().toLowerCase();
+			if (Girl.girlClasses.indexOf(input) >= 0)
+			{
+				player.setGirlClass(input);
+				TextDemo.print("You have chosen " + input + ".");
+				break;
+			}
+			else
+			{
+				TextDemo.print("You must choose from the provided options.");
+			}
+		}
+	}
+}
