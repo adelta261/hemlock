@@ -1,0 +1,33 @@
+package hemlock;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Location implements Serializable
+{
+	private String locationName;
+	
+	//list of all descriptions in a location, rather than broad description
+	private ArrayList<String> locationDescription;
+
+	public void createLocation(String locationName)
+	{
+		this.locationName = locationName;
+		//this.locationDescription = Dialogue.setLocationDialogue(locationName);
+	}
+	//setters
+	
+	
+	
+	//getters
+	public ArrayList<String> getLocationDescription()
+	{
+		return this.locationDescription;
+	}
+
+	public String getLocationName()
+	{
+		return this.locationName;
+	}	
+
+}

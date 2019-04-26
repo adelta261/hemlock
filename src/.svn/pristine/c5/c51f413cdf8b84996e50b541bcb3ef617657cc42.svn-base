@@ -1,0 +1,7 @@
+package hemlock;
+
+import org.json.simple.JSONObject;
+
+public interface ISavable {
+	public void save(JSONObject out) throws Exception;
+}
