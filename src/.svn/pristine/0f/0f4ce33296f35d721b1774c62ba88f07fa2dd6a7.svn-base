@@ -1,0 +1,40 @@
+package hemlock;
+
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+public final class SaveManager {
+
+	public static boolean saveObject(String fileName, ISavable ob) {
+		try {
+			JSONObject saveObject = new JSONObject();
+
+			ob.save(saveObject);
+
+			Files.write(Paths.get(fileName), saveObject.toJSONString().getBytes());
+			return true;
+		} catch (Exception e) {
+			TextDemo.error("Error saving file " + fileName, e);
+			return false;
+		}
+	}
+
+	public static boolean loadObject(String fileName, ILoadable ob) {
+		try {
+			FileReader reader = new FileReader(fileName);
+			JSONParser jsonParser = new JSONParser();
+
+			JSONObject loadObject = (JSONObject) jsonParser.parse(reader);
+
+			ob.load(loadObject);
+			return true;
+		} catch (Exception e) {
+			TextDemo.error("Error loading file " + fileName, e);
+			return false;
+		}
+	}
+}

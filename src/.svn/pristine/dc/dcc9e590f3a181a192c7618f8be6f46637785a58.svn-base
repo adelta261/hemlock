@@ -1,0 +1,822 @@
+package hemlock;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Random;
+
+public class Girl {
+
+	private boolean isPlayer;
+	private String gender;
+	private String name;
+	private String lastName;
+	private String displayName;
+	private String house;
+	private String houseColour;
+	private String club;
+	private String subject;
+	private String majorPersonality;
+	private String minorPersonality;
+	private String race;
+	private String skinColour;
+	private String hairColour;
+	private String hairType;
+	private String bodyType;
+	private int stars;
+	private int index;
+	private Boolean alive;
+	private String eatenBy;
+	private Boolean predator;
+	private Boolean teacher;
+	private ArrayList<Girl> victims;
+	
+	private String playerClass;
+	private String clubType;
+	private int charisma;
+	private int intelligence;
+	private int luck;
+	private int perception;
+	private int strength;
+	private int capacity;
+	private int overfullCap;
+	private int fullCap;
+	private int days;
+	private int lastDay;
+	private boolean gainMode = false;
+	private boolean furMode = false;
+	private double startingHeight;
+	private double startingWeight;
+	private double lastHeight;
+	private double lastWeight;
+	private double height;
+	private double weight;
+	
+	//================================================================================
+    // Girl constructor
+    //================================================================================
+	
+	public void setPlayer(){
+		this.isPlayer = true;
+		
+		//names
+		this.name = "none";
+		this.lastName = "none";
+		this.displayName = "";
+		this.gender ="none";
+		
+		//appearance
+		this.bodyType = "none";
+		this.race = "none";
+		this.skinColour = "none";
+		this.hairColour = "none";
+		this.hairType = "none";
+		
+		//groups
+		this.house ="none";
+		this.club = "none";
+		
+		//traits
+		this.majorPersonality = "none";
+		this.minorPersonality = "none";
+		
+		//entity state
+		this.alive = true;
+		this.eatenBy = "none";
+		this.predator = false;
+		this.teacher = false;
+		this.victims = new ArrayList<Girl>();
+		this.stars = 0;
+		this.index = 0;
+		
+		//set stats
+		this.capacity = 2;
+		this.overfullCap = capacity+1;
+		this.fullCap = capacity+2;
+		this.charisma = 0;
+		this.intelligence = 0;
+		this.luck = 0;
+		this.perception = 0;
+		this.strength = 0;
+		this.startingHeight = 1;
+		this.startingWeight = 1;
+		this.lastHeight = 1;
+		this.lastWeight = 1;
+		this.height = 1;
+		this.weight = 1;
+	}
+	
+	public void createGirl(){
+		this.isPlayer = false;
+		
+		//names
+		this.name = "none";
+		this.lastName = "none";
+		this.displayName = "";
+		this.gender ="none";
+		
+		//appearance
+		this.bodyType = "none";
+		this.race = "none";
+		this.skinColour = "none";
+		this.hairColour = "none";
+		this.hairType = "none";
+		
+		//groups
+		this.house ="none";
+		this.club = "none";
+		
+		//traits
+		this.majorPersonality = "none";
+		this.minorPersonality = "none";
+		
+		//entity state
+		this.alive = true;
+		this.eatenBy = "none";
+		this.predator = false;
+		this.teacher = false;
+		this.victims = new ArrayList<Girl>();
+		this.stars = 0;
+		this.index = 0;
+		
+		//set stats
+		this.capacity = 2;
+		this.overfullCap = capacity+1;
+		this.fullCap = capacity+2;
+		this.charisma = 0;
+		this.intelligence = 0;
+		this.luck = 0;
+		this.perception = 0;
+		this.strength = 0;
+		this.startingHeight = 1;
+		this.startingWeight = 1;
+		this.lastHeight = 1;
+		this.lastWeight = 1;
+		this.height = 1;
+		this.weight = 1;
+	}
+	
+	//================================================================================
+    // Function that generates a girl
+    //================================================================================
+	
+	public static void makeGirls(Girl[] girls, int numTeachers, boolean furMode) {
+		for(int i = 0; i < girls.length; i++) {
+			if(i<numTeachers) {
+				girls[i].createGirl();
+				girls[i].setIndex(i);
+				girls[i].setGirlName(girlNames);
+				girls[i].setGirlLastName(girlLastNames);
+				girls[i].setGirlDisplayName("Miss " + girls[i].getGirlLastName());
+				girls[i].setSubject(i);
+				girls[i].setGirlMajorPersonality(girlMajorPersonality);
+				girls[i].setGirlMinorPersonality(girlMinorPersonality);
+				if(furMode) {
+					girls[i].setGirlRace(girlFurRace);
+					girls[i].setGirlSkinColour(girlFurColour);
+				} else {
+					girls[i].setGirlRace(girlRace);
+				}
+				girls[i].setGirlHairColour(girlHairColour);
+				girls[i].setGirlHairType(girlHairType);
+				girls[i].setGirlBodyType(girlBodyType);
+				girls[i].setGirlTeacher(true);
+				girls[i].setGirlPredator();
+			} else {
+				girls[i].createGirl();
+				girls[i].setIndex(i);
+				girls[i].setGirlName(girlNames);
+				girls[i].setGirlLastName(girlLastNames);
+				girls[i].setGirlDisplayName(girls[i].getGirlName());
+				girls[i].setGirlHouse();
+				girls[i].setGirlClub(girlClub);
+				girls[i].setGirlMajorPersonality(girlMajorPersonality);
+				girls[i].setGirlMinorPersonality(girlMinorPersonality);
+				if(furMode) {
+					girls[i].setGirlRace(girlFurRace);
+					girls[i].setGirlSkinColour(girlFurColour);
+				} else {
+					girls[i].setGirlRace(girlRace);
+				}
+				girls[i].setGirlHairColour(girlHairColour);
+				girls[i].setGirlHairType(girlHairType);
+				girls[i].setGirlBodyType(girlBodyType);
+				girls[i].setGirlPredator();
+			}
+		}
+	}
+	
+	//================================================================================
+    // Girl Setters
+    //================================================================================
+	
+		//names
+		public void setGirlName(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.name = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlLastName(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.lastName = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlDisplayName(String displayName) {
+			this.displayName = displayName;
+		}
+	
+		public void setSubject(int num) {
+			switch(num) {
+			case 0: 
+			case 1: this.subject = "Headmistress"; break;
+			case 2: this.subject = "Cheer Coach"; break;
+			case 3: this.subject = "Track Coach"; break;
+			case 4: this.subject = "Swim Coach"; break;
+			case 5: this.subject = "Math"; break;
+			case 6: this.subject = "English"; break;
+			case 7: this.subject = "History"; break;
+			case 8: this.subject = "Drama"; break;
+			case 9: this.subject = "Music"; break;
+			case 10: this.subject = "Lunchlady"; break;
+			case 11: this.subject = "Kitchen Hand"; break;
+			case 12: this.subject = "Substitute Teacher"; break;
+			case 13: this.subject = "Substitute Teacher"; break;
+			case 14: this.subject = "Substitute Teacher"; break;
+			case 15: this.subject = "Substitute Teacher"; break;
+			case 16: this.subject = "English"; break;
+			case 17: this.subject = "History"; break;
+			case 18: this.subject = "Drama"; break;
+			case 19: this.subject = "Music"; break;
+			}
+		}
+		
+		public void setIndex(int index) {
+			this.index = index;
+		}
+	
+		public void setVictims(ArrayList<Girl> victims) {
+			this.victims = victims;
+		}
+		
+		public void setGirlEatenBy(String eatenBy) {
+			this.eatenBy = eatenBy;
+		}
+	
+		public void setGirlPredator() {
+			Random rand = new Random();
+			int predator = rand.nextInt(25);
+			
+			if(predator == 1) {
+				this.predator = true;
+			}
+		}
+		
+		public void setGirlTeacher(boolean teacher) {
+			this.teacher = teacher;
+		}
+		
+		public void setGirlHouse() {
+			Random rand = new Random();
+			int house = rand.nextInt(2)+1;
+			
+			if(house == 1) {
+				this.house = "Dagonbelch";
+				this.houseColour = "red";
+			} else if (house == 2) {
+				this.house = "Tendriltake";
+				this.houseColour = "green";
+			} else if (house == 3) {
+				this.house = "Lloigorslouch";
+				this.houseColour = "blue";
+			}
+		}
+		
+		public void setGirlClub(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.club = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlMajorPersonality(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.majorPersonality = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlMinorPersonality(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.minorPersonality = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlRace(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.race = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlHairColour(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.hairColour = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlBodyType(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.bodyType = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlHairType(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.hairType = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlSkinColour(ArrayList<String> arrList) {
+			Random rand = new Random();
+			this.skinColour = arrList.get(rand.nextInt(arrList.toArray().length));
+		}
+		
+		public void setGirlStars(int stars) {
+			this.stars = stars;
+		}
+		
+		public void setGirlAlive(boolean alive) {
+			this.alive = alive;
+		}
+		
+		
+		
+	
+	//================================================================================
+    // Girl Getters
+    //================================================================================
+	
+		public boolean getTeacher() {
+			return this.teacher;
+		}
+		
+		public String getGirlDisplayName() {
+			return this.displayName;
+		}
+		
+		public int getIndex() {
+			return this.index;
+		}
+			
+		public String getGirlEatenBy() {
+			return this.eatenBy;
+		}
+		
+		public String getSkinColour() {
+			return this.skinColour;
+		}
+			
+		public ArrayList<Girl> getVictims() {
+			return this.victims;
+		}
+			
+		public String getGirlClub() {
+			return this.club;
+		}
+			
+		public String getGirlHouse() {
+			return this.house;
+		}
+		
+		public String getGirlHouseColour() {
+			return this.houseColour;
+		}
+		
+		public String getGirlMajorPersonality() {
+			return this.majorPersonality;
+		}
+		
+		public String getGirlMinorPersonality() {
+			return this.minorPersonality;
+		}
+		
+		public String getGirlRace() {
+			return this.race;
+		}
+		
+		public String getGirlHairColour() {
+			return this.hairColour;
+		}
+		
+		public String getGirlHairType() {
+			return this.hairType;
+		}
+	
+		public String getGirlName() {
+			return this.name;
+		}
+		
+		public String getGirlLastName() {
+			return this.lastName;
+		}
+		
+		public int getGirlStars() {
+			return this.stars;
+		}
+		
+		public Boolean getGirlAlive() {
+			return this.alive;
+		}
+		
+		public Boolean getGirlPredator() {
+			return this.predator;
+		}
+		
+		public String getGirlBodyType() {
+			return this.bodyType;
+		}
+		
+		public String getGirlSubject() {
+			return this.subject;
+		}
+		
+		//================================================================================
+	    // Player SETTERS
+	    //================================================================================
+
+		//player details
+		
+		public void setPlayerName(String name) {
+			this.name = name;
+		}
+		
+		public void setPlayerLastName(String lastName) {
+			this.lastName = lastName;
+		}
+		
+		public void setPlayerHouse() {
+			Random rand = new Random();
+			int house = rand.nextInt(3);
+			if(house == 0) {
+				this.house = "Dagonbelch";
+			} else if (house == 1) {
+				this.house = "Tendriltake";
+			} else if (house == 2) {
+				this.house = "Lloigorslouch";
+			}
+			
+		}
+		
+		
+		public void setPlayerRace(String race) {
+			this.race = race;
+		}
+		
+		public void setPlayerSkinColour(String skinColour) {
+			this.skinColour = skinColour;
+		}
+		
+		public void setPlayerHairColour(String hairColour) {
+			this.hairColour = hairColour;
+		}
+		
+		public void setPlayerHairType(String hairType) {
+			this.hairType = hairType;
+		}
+		
+		public void setPlayerBodyType(String bodyType) {
+			this.bodyType = bodyType;
+		}
+		
+		public void setPlayerClub(String club) {
+			this.clubType = club;
+		}
+		
+		//game state
+		
+		public void setPlayerAlive(Boolean alive) {
+			this.alive = alive;
+		}
+		
+		public void setDays(int days) {
+			this.days = days;
+		}
+		
+		public void setLastDay(int days) {
+			this.lastDay = days;
+		}
+		
+			
+		//player stats
+		
+		public void setPlayerClass(String playerClass) {
+			this.playerClass = playerClass;
+		}
+		
+		public void setCharisma(int num) {
+			this.charisma = num;
+		}
+		
+		public void setIntelligence(int num) {
+			this.intelligence = num;
+		}
+		
+		public void setLuck(int num) {
+			this.luck = num;
+		}
+		
+		public void setPerception(int num) {
+			this.perception = num;
+		}
+		
+		public void setStrength(int num) {
+			this.strength = num;
+		}
+		
+		//weight gain stats
+		
+		public void setPlayerHeight(double height) {
+			this.height = height;
+		}
+		
+		public void setPlayerWeight(double weight) {
+			this.weight = weight;
+		}
+		
+		public void setPlayerLastHeight(double height) {
+			this.lastHeight = height;
+		}
+		
+		public void setPlayerLastWeight(double weight) {
+			this.lastWeight = weight;
+		}
+		
+		public void setPlayerStartingHeight(double height) {
+			this.startingHeight = height;
+		}
+		
+		public void setPlayerStartingWeight(double weight) {
+			this.startingWeight = weight;
+		}
+		
+		//game modes
+		
+			public void setGainMode(Boolean gainMode) {
+				this.gainMode = gainMode;
+			}
+			
+			public void setFurMode(Boolean furMode) {
+				this.furMode = furMode;
+			}
+		
+		
+		//================================================================================
+	    // Player GETTERS
+	    //================================================================================
+		
+		//player details
+		
+		public String getPlayerName() {
+			return this.name;
+		}
+		
+		public String getPlayerLastName() {
+			return this.lastName;
+		}
+		
+		public String getPlayerHouse() {
+			return this.house;
+		}
+			
+		public String getPlayerRace() {
+			return this.race;
+		}
+		
+		public String getPlayerSkinColour() {
+			return this.skinColour;
+		}
+		
+		public String getPlayerHairColour() {
+			return this.hairColour;
+		}
+		
+		public String getPlayerHairType() {
+			return this.hairType;
+		}
+		
+		public String getPlayerBodyType() {
+			return this.bodyType;
+		}
+		
+		public String getPlayerClub() {
+			return this.clubType;
+		}
+		
+		//game state
+		
+		public Boolean getPlayerAlive() {
+			return this.alive;
+		}
+		
+		public int getLastDay() {
+			return this.lastDay;
+		}
+		
+		public int getDays() {
+			return this.days;
+		}
+			
+		//stats
+		public String getPlayerClass() {
+			return this.playerClass;
+		}
+		
+		public int getCharisma() {
+			return this.charisma;
+		}
+		
+		public int getIntelligence() {
+			return this.intelligence;
+		}
+		
+		public int getLuck() {
+			return this.luck;
+		}
+		
+		public int getPerception() {
+			return this.perception;
+		}
+		
+		public int getStrength() {
+			return this.strength;
+		}
+		
+		//weight gain stats
+		
+		public double getPlayerHeight() {
+			return this.height;
+		}
+		
+		public double getPlayerWeight() {
+			return this.weight;
+		}
+		
+		public double getPlayerStartingHeight() {
+			return this.startingHeight;
+		}
+		
+		public double getPlayerStartingWeight() {
+			return this.startingWeight;
+		}
+		
+		public double getPlayerLastHeight() {
+			return this.lastHeight;
+		}
+		
+		public double getPlayerLastWeight() {
+			return this.lastWeight;
+		}
+		
+		//modes
+		
+		public Boolean getGainMode() {
+			return this.gainMode;
+		}
+		
+		public Boolean getFurMode() {
+			return this.furMode;
+		}
+	
+	//================================================================================
+    // Reading from file
+    //================================================================================
+	
+	static URL urlDetailFile = Girl.class.getResource("resources/girlMaster.txt");
+	
+	static ArrayList<String> girlNames = Girl.loadGirlDetails("firstName");
+	static ArrayList<String> girlLastNames = Girl.loadGirlDetails("lastName");
+	static ArrayList<String> girlMajorPersonality = Girl.loadGirlDetails("majorPersonality");
+	static ArrayList<String> girlMinorPersonality = Girl.loadGirlDetails("minorPersonality");
+	static ArrayList<String> girlRace = Girl.loadGirlDetails("race");
+	static ArrayList<String> girlBodyType = Girl.loadGirlDetails("bodyType");
+	static ArrayList<String> girlHairColour = Girl.loadGirlDetails("hairColour");
+	static ArrayList<String> girlHairType = Girl.loadGirlDetails("hairType");
+	static ArrayList<String> girlClub = Girl.loadGirlDetails("club");
+	
+	//furmode
+	static ArrayList<String> girlFurRace = Girl.loadGirlDetails("furRace");
+	static ArrayList<String> girlFurColour = Girl.loadGirlDetails("furColour");
+		
+	public static ArrayList<String> loadGirlDetails(String type) {
+		ArrayList<String> data = new ArrayList<String>();
+        try(BufferedReader br = new BufferedReader(
+        new InputStreamReader(urlDetailFile.openStream()))){
+        	 String sCurrentLine;
+             while ((sCurrentLine = br.readLine()) != null) {
+             	switch(type) {
+             	case "firstName": if(sCurrentLine.equals("---START_FIRST_NAMES---")) {
+ 									while ((sCurrentLine = br.readLine()) != null) {
+ 										if(sCurrentLine.equals("---END_FIRST_NAMES---")) {
+ 											break;
+ 										} else {
+ 											data.add(sCurrentLine);
+ 										}
+ 									}
+ 	            				} break;			
+             	case "lastName": if(sCurrentLine.equals("---START_LAST_NAMES---")) {
+ 									while ((sCurrentLine = br.readLine()) != null) {
+ 										if(sCurrentLine.equals("---END_LAST_NAMES---")) {
+ 											break;
+ 										} else {
+ 											data.add(sCurrentLine);
+ 										}
+ 									}
+ 			    				} break;
+             	case "majorPersonality": if(sCurrentLine.equals("---START_MAJOR_PERSONALITY---")) {
+ 											while ((sCurrentLine = br.readLine()) != null) {
+ 												if(sCurrentLine.equals("---END_MAJOR_PERSONALITY---")) {
+ 													break;
+ 												} else {
+ 													data.add(sCurrentLine);
+ 												}
+ 											}
+ 										} break;
+             	case "minorPersonality": if(sCurrentLine.equals("---START_MINOR_PERSONALITY---")) {
+ 											while ((sCurrentLine = br.readLine()) != null) {
+ 												if(sCurrentLine.equals("---END_MINOR_PERSONALITY---")) {
+ 													break;
+ 												} else {
+ 													data.add(sCurrentLine);
+ 												}
+ 											}
+ 										} break;
+             	case "race": if(sCurrentLine.equals("---START_RACE---")) {
+ 								while ((sCurrentLine = br.readLine()) != null) {
+ 									if(sCurrentLine.equals("---END_RACE---")) {
+ 										break;
+ 									} else {
+ 										data.add(sCurrentLine);
+ 									}
+ 								}
+ 							} break;
+             	case "bodyType":if(sCurrentLine.equals("---START_BODY_TYPE---")) {
+ 									while ((sCurrentLine = br.readLine()) != null) {
+ 										if(sCurrentLine.equals("---END_BODY_TYPE---")) {
+ 											break;
+ 										} else {
+ 											data.add(sCurrentLine);
+ 										}
+ 									}
+ 								} break;
+             	case "hairColour":if(sCurrentLine.equals("---START_HAIR_COLOUR---")) {
+ 									while ((sCurrentLine = br.readLine()) != null) {
+ 										if(sCurrentLine.equals("---END_HAIR_COLOUR---")) {
+ 											break;
+ 										} else {
+ 											data.add(sCurrentLine);
+ 										}
+ 									}
+ 								} break;
+             	case "hairType":if(sCurrentLine.equals("---START_HAIR_TYPE---")) {
+ 									while ((sCurrentLine = br.readLine()) != null) {
+ 										if(sCurrentLine.equals("---END_HAIR_TYPE---")) {
+ 											break;
+ 										} else {
+ 											data.add(sCurrentLine);
+ 										}
+ 									}
+ 								} break;
+             	case "club": if(sCurrentLine.equals("---START_CLUBS---")) {
+             					while ((sCurrentLine = br.readLine()) != null) {
+             						if(sCurrentLine.equals("---END_CLUBS---")) {
+             							break;
+             						} else {
+             							data.add(sCurrentLine);
+             						}
+             	
+             					} 
+             				} break;
+	            case "furRace": if(sCurrentLine.equals("---START_FUR_RACE---")) {
+			 					while ((sCurrentLine = br.readLine()) != null) {
+			 						if(sCurrentLine.equals("---END_FUR_RACE---")) {
+			 							break;
+			 						} else {
+			 							data.add(sCurrentLine);
+			 						}
+			 					} 
+	            			} break;
+             	case "furColour":  if(sCurrentLine.equals("---START_FUR_COLOUR---")) {
+			 					while ((sCurrentLine = br.readLine()) != null) {
+			 						if(sCurrentLine.equals("---END_FUR_COLOUR---")) {
+			 							break;
+			 						} else {
+			 							data.add(sCurrentLine);
+			 						}
+			 					} 
+			    			} break;
+	             	}
+             }
+        } catch(IOException e) {
+			TextDemo.error(e);
+        }
+        return(data);
+    }
+
+
+}

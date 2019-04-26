@@ -1,0 +1,33 @@
+package hemlock;
+
+import java.util.ArrayList;
+
+public class Location {
+
+	private String locationName;
+	private ArrayList<Girl> locationGirls;
+	private ArrayList<ArrayList<String>> locationDescription;
+	
+	
+	public void createLocation(String locationName,Scene scene) {
+		 this.locationName = locationName;
+		 this.locationGirls = Functions.createGirlsInSceneLocation(scene);
+		 this.locationDescription = Dialogue.setLocationDialogue(locationName);
+		}
+
+	
+	
+	public ArrayList<ArrayList<String>> getLocationDescription(){
+		return this.locationDescription;
+	}
+	
+	public ArrayList<Girl> getLocationGirls(){
+		return this.locationGirls;
+	}
+		
+	public String getLocationName() {
+		return this.locationName;
+	}
+	
+	
+}

@@ -1,0 +1,206 @@
+package hemlock;
+
+/** Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+*   - Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*
+*   - Redistributions in binary form must reproduce the above copyright
+*     notice, this list of conditions and the following disclaimer in the
+*     documentation and/or other materials provided with the distribution.
+*
+*   - Neither the name of Oracle or the names of its
+*     contributors may be used to endorse or promote products derived
+*     from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+* IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+* THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+* LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**/ 
+
+/**creating gui
+JFrame frame = new JFrame();
+frame.add( new JLabel("Hemlock High" ), BorderLayout.NORTH );
+JTextArea ta = new JTextArea();
+TextAreaOutputStream taos = new TextAreaOutputStream( ta, 60 );
+PrintStream ps = new PrintStream( taos );
+System.setOut( ps );
+System.setErr( ps );
+
+
+frame.add( new JScrollPane( ta )  );
+
+frame.pack();
+frame.setVisible( true );
+frame.setSize(800,600);
+   
+JTextField textField = new JTextField(20);
+textField.addActionListener(this);
+**/
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Hashtable;
+import java.util.Scanner;
+
+import javax.swing.*;
+import javax.swing.text.StyledDocument;
+
+public class TextDemo extends JPanel implements ActionListener {
+    public static JTextField textField;
+    private JTextPane textArea;
+    public static String text;
+    private static TextDemo instance;
+    
+    JTextField tfIn;
+    JLabel lblOut;
+    private final PipedInputStream inPipe = new PipedInputStream();
+    private final PipedInputStream outPipe = new PipedInputStream();
+    PrintWriter inWriter;
+    
+    String input = null;
+    Scanner inputReader = new Scanner(System.in);
+    
+    public TextDemo() {
+        super(new GridBagLayout());
+
+        System.setIn(inPipe); 
+        try {
+            System.setOut(new PrintStream(new PipedOutputStream(outPipe), true)); 
+            inWriter = new PrintWriter(new PipedOutputStream(inPipe), true); 
+        }
+        catch(IOException e) {
+            System.out.println("Error: " + e);
+            return;
+        }
+        
+        Font font = new Font("Courier", Font.BOLD, 14);
+        Color textColor = new Color(0xf0f0f0);
+        Color backColor = new Color(0x000000);
+        
+        textArea = new JTextPane();
+        textArea.setForeground(textColor);
+        textArea.setBackground(backColor);
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+	    textArea.setFont(font);
+	    textArea.setMargin(new Insets(10,10,10,10));
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+	    
+        tfIn = new JTextField();
+        tfIn.setForeground(textColor);
+        tfIn.setBackground(backColor);
+	    tfIn.setFont(font);
+        tfIn.addActionListener(this);
+
+        //Add Components to this panel.
+        GridBagConstraints c;
+        
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridy = 1;
+        add(tfIn, c);
+
+
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.gridy = 0;
+        add(scrollPane, c);
+        
+        instance = this;
+        
+        TextUtils.RunTest();
+    }
+    
+    public static void print(String text)
+    {    
+    	StyledDocument sDoc = (StyledDocument)instance.textArea.getDocument();
+    	
+    	// Break text into runs and determine styling.
+    	
+    	try
+    	{
+    		sDoc.insertString(sDoc.getLength(), text + "\n\n", null);
+    	}
+    	catch (Exception e)
+    	{
+    		error(e);
+    	}
+    	
+    	instance.textArea.setCaretPosition(sDoc.getLength());
+    }
+
+    public static void error(Exception e)
+    {
+		System.err.println(stackString(e));
+    }
+    
+	private static String stackString( Exception e )
+	{
+		try
+		{
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace( pw );
+			return sw.toString();
+		}
+		catch( Exception e2 )
+		{
+			return "Error retrieving stack trace";
+		}
+	}
+
+    public synchronized void actionPerformed(ActionEvent evt)
+    {
+        String text = tfIn.getText();
+        if(text.equals("clear")) {
+            textArea.setText("");
+        }
+        //TextDemo.printf("\ninput: '" + text + "'\n");
+        tfIn.setText("");
+        inWriter.println(text); 
+    }
+    
+    /**
+     * Create the GUI and show it.  For thread safety,
+     * this method should be invoked from the
+     * event dispatch thread.
+     */
+    public static void createAndShowGUI() {
+        //Create and set up the window.
+        JFrame frame = new JFrame("Hemlock High");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //Add contents to the window.
+        frame.add(new TextDemo());
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+	    frame.setSize(900,650);
+    }
+
+}

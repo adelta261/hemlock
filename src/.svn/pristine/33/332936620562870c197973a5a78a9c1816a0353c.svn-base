@@ -1,0 +1,686 @@
+package hemlock;
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Functions {
+
+	static Scanner in = new Scanner(System.in);
+		
+	//================================================================================
+    // Printing lists
+    //================================================================================
+	
+	//uses tab padding to print a list of girls/objects
+	public static void printTabbedList(ArrayList<Girl> girlsList, int num, int perLine) {
+		for(int i = 0; i < girlsList.toArray().length; i++) {
+			if(i%perLine == 0) {
+				System.out.printf(Dialogue.tabPadding("\n\t" + girlsList.get(i).getGirlDisplayName() + " " + convertStars(girlsList.get(i).getGirlStars()),num));
+			} else {
+				System.out.printf(Dialogue.tabPadding("\t" + girlsList.get(i).getGirlDisplayName() + " " + convertStars(girlsList.get(i).getGirlStars()),num));
+			}
+		}
+		System.out.printf("\n");
+	}
+	
+	public static void printCohort(Girl[] arr) {
+		System.out.println("\nThese are all the girls and teachers who still roam the halls!\n");
+		ArrayList<Girl> girlsList = new ArrayList<Girl>(); 
+		for(int i = 0; i < arr.length; i++){
+			if(arr[i].getGirlAlive() == true) {
+				girlsList.add(arr[i]);
+			}
+		}
+		printTabbedList(girlsList,3,4);
+	}
+	
+	//paces a string with spaces to evenly fit on a page
+	
+	
+	public static void printGreen(Scene scene) {
+		System.out.println("\nThese are the girls and teachers who have perished in the halls!\n");
+		printTabbedList(scene.getGreen(),3,4);
+	}
+	
+	public static void printPredators(Girl[] arr) {
+		ArrayList<Girl> girlsList = new ArrayList<Girl>(); 
+		for(int i = 0; i < arr.length; i++){
+			if(arr[i].getGirlAlive() == true && arr[i].getGirlPredator() == true) {
+				girlsList.add(arr[i]);
+			}
+		}
+		printTabbedList(girlsList,3,4);
+	}
+	
+	public static void printPredatorLeaderboard(Girl[] arr) {
+		int highest = -1;
+		while(highest != 0) {
+			for(int i = 0; i < arr.length; i++){
+				if(arr[i].getGirlAlive() == true && arr[i].getGirlPredator() == true) {
+					if(arr[i].getVictims() != null) {
+						if(arr[i].getVictims().toArray().length > highest) {
+							highest = arr[i].getVictims().toArray().length;
+						}
+						System.out.println("\t" +arr[i].getGirlName() + " " + convertStars(arr[i].getGirlStars()) + "\t"
+								+ arr[i].getVictims().toArray().length + " girls eaten.");
+					}
+				}
+			}
+		}
+	}
+	
+	
+	
+	public static void girlLookup(String girlName, Scene scene) {
+		boolean girlExists = false;
+		Girl[] arr = scene.getSceneGirls();
+		
+		for(int i = 0; i < arr.length; i++){
+			if(girlName.equals(arr[i].getGirlDisplayName().toLowerCase())) {
+				Dialogue.girlOverview(i,scene);
+				girlExists = true;
+			}
+		}
+		if(girlExists == false) {
+			System.out.println("\nSorry, that person does not exist!");
+		}
+	}
+	
+	
+	
+	//================================================================================
+    // Eating actions
+    //================================================================================
+	
+	/** //finds the girls who are edible, checks if they are valid
+	public static void edibles(String input, Scene scene) {
+		String[] arr = new String[scene.getSceneTeachers().length + scene.getSceneGirls().length];
+		for(int i = 0; i < scene.getSceneTeachers().length; i++) {
+			arr[i] = scene.getSceneTeachers()[i].getTeacherName();
+		}
+		for(int i = 0; i < scene.getSceneGirls().length; i++) {
+			arr[i + scene.getSceneTeachers().length] = scene.getSceneGirls()[i].getGirlName();
+		}
+		for(int i = 0; i < arr.length; i++) {
+			if(input.equals(arr[i]) && i < scene.getSceneTeachers().length) {
+				Functions.beginEatingTeacher(input,scene);
+				return;
+			} else {
+				Functions.beginEatingGirl(input,scene);
+				return;
+			}
+		}
+	}**/
+	
+	//begin eating a person
+	public static void beginEatingGirl(String girlName, Scene scene) {
+		boolean girlInScene = false;
+		boolean eating = true;
+		boolean teachersShow = false;
+		if(scene.getSceneWindow().getCaught()==true) {
+			return;
+		}
+			for(int i = 0; i < scene.getGirlsInScene().toArray().length; i++){
+				if(girlName.equals(scene.getGirlsInScene().get(i).getGirlDisplayName().toLowerCase()) == true && scene.getGirlsInScene().get(i).getGirlAlive() == true ) {
+					int girlIndex = i;
+					girlInScene = true;
+					girlName = scene.getGirlsInScene().get(i).getGirlDisplayName();
+					
+					//setting the dialogue
+					scene.getDialogue().setEatingGirlDialogue(scene.getGirlsInScene().get(i), scene);
+					System.out.println("Use 'e' to keep eating, or 's' to stop eating.");
+					System.out.print(Dialogue.chooseRandomString(scene.getDialogue().getEatingGirlDialogue().get(0)));
+					
+					int turns = 1;
+					while(eating == true) {
+						Random rand = new Random();
+						//System.out.printf("\n");
+						while(turns < 10) {
+							if(scene.getSceneWindow().getOpen()==true){
+								
+								int result = Inputs.eatingInputs();
+								if(result == 1) {
+									manipulateWindowEating(girlName, scene);
+									turns = turns + rand.nextInt(3)+2;
+									if(turns>10) {
+										break;
+									}
+									System.out.print(Dialogue.chooseRandomString(scene.getDialogue().getEatingGirlDialogue().get(turns+2)));
+								} else if (result == 2){
+									manipulateWindowEating(girlName, scene);
+									System.out.printf("You let " + girlName +" go! It must be her lucky day. ");
+									addGirlStars(girlName,scene);
+									eating = false;
+									return;
+								}		
+							} else if (scene.getSceneWindow().getCaught()==false){
+									if(teachersShow == false) {
+										scene.setGirlsInScene(createTeachersInScene(scene));
+										System.out.printf("You have been caught eating another student by " + scene.getGirlsInScene().get((scene.getGirlsInScene().toArray().length)-1).getGirlDisplayName() + "! ");
+										teachersShow = true;
+									}								
+									int result = Inputs.eatingInputs();
+									if(scene.getGirlsInScene().get(girlIndex).getTeacher() == true) {
+										eatingConsequencesTeacher(girlName, scene, result);
+									} else if (scene.getGirlsInScene().get(girlIndex).getTeacher() == false){
+										eatingConsequencesGirl(girlName, scene, result);
+									}
+									
+									return;
+								} 							
+							}
+					if(turns>=10) {
+						System.out.printf(Dialogue.chooseRandomString(scene.getDialogue().getEatingGirlDialogue().get(2)));
+						Functions.addVictimPlayer(scene, girlName);
+						scene.setGirlsInScene(removeGirlFromScene(scene,girlName));
+						System.out.println("What do you do now?");
+					}
+					eating = false;
+					return;
+				}
+			}
+		}
+	}
+	
+	private static ArrayList<String> setGirlVoreDialogue(Scene scene, Girl girl) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Scene eatingConsequencesGirl(String girlName, Scene scene, int result) {
+		Random rand = new Random();
+		String teacherName = scene.getGirlsInScene().get((scene.getGirlsInScene().toArray().length)-1).getGirlDisplayName();
+		switch(result) {
+		case 1:
+			/**if(rand.nextInt(10-scene.getScenePlayer().getLuck()) == 0) {
+				//allowed to finish eating, scene continues
+				turns = howManyTurns;
+				scene.getSceneWindow().setCaught(true); scene.setCaught(false);
+				manipulateWindowEating(girlName, scene);
+				Dialogue.girlEatingLuck(girlName, scene.getTeachersInScene().get(0).getTeacherName(), scene.getScenePlayer().getPlayerName(),1);
+				return;
+			} else {**/
+				//scene stopped
+				scene.getSceneWindow().setCaught(true); scene.setCaught(true);
+				Dialogue.mealInterrupted(girlName, teacherName);
+				addGirlStars(girlName,scene);
+			//} 
+				break;		
+		case 2: 
+				if(rand.nextInt(10-scene.getScenePlayer().getLuck()) < 3 ) {
+					//stopped, but scene continues 
+					scene.getSceneWindow().setCaught(true); 	scene.setCaught(false);
+					manipulateWindowEating(girlName, scene); addGirlStars(girlName,scene); scene.setGirlsInScene(removeGirlFromScene(scene,girlName));
+					Dialogue.girlEatingLuck(girlName, teacherName, scene.getScenePlayer().getPlayerName(),0);
+				} else {
+					//scene stopped
+					scene.getSceneWindow().setCaught(true); scene.setCaught(true);
+					addGirlStars(girlName,scene);
+					Dialogue.mealInterrupted(girlName, teacherName);
+				} break;
+		}
+		return scene;
+	}
+	
+	public static Scene eatingConsequencesTeacher(String girlName, Scene scene, int result) {
+		Random rand = new Random();
+		String teacherName = scene.getGirlsInScene().get((scene.getGirlsInScene().toArray().length)-1).getGirlDisplayName();
+		switch(result) {
+		case 1:
+			/**if(rand.nextInt(10-scene.getScenePlayer().getLuck()) == 0) {
+				//allowed to finish eating, scene continues
+				turns = howManyTurns;
+				scene.getSceneWindow().setCaught(true); scene.setCaught(false);
+				manipulateWindowEating(girlName, scene);
+				Dialogue.girlEatingLuck(girlName, scene.getTeachersInScene().get(0).getTeacherName(), scene.getScenePlayer().getPlayerName(),1);
+				return;
+			} else {**/
+				//player dies
+					scene.getSceneWindow().setCaught(true); 	scene.setCaught(true);
+					scene.getScenePlayer().setPlayerAlive(false);
+					Dialogue.gameOver();
+					//Dialogue.mealInterrupted(girlName, teacherName);
+			//} 
+				break;		
+		case 2: 
+				if(rand.nextInt(10-scene.getScenePlayer().getLuck()) < 3 ) {
+					//player lives, but scene stopped
+					scene.getSceneWindow().setCaught(true); 	scene.setCaught(true);
+					addGirlStars(girlName,scene);
+					//Dialogue.teacherEatingLuck(girlName, teacherName, scene.getScenePlayer().getPlayerName(),0);
+				} else {
+					//player dies
+					scene.getSceneWindow().setCaught(true); 	scene.setCaught(true);
+					scene.getScenePlayer().setPlayerAlive(false);
+					Dialogue.gameOver();
+				} break;
+		}
+		return scene;
+	}
+	
+	//================================================================================
+    // Girls in scene
+    //================================================================================
+	
+	//populates the scene with girls
+	public static ArrayList<Girl> createGirlsInSceneLocation(Scene scene){
+		Random rand = new Random();
+		ArrayList<Girl> locationGirlsList = new ArrayList<Girl>();
+		while(locationGirlsList.toArray().length<scene.getSceneGirls().length/10) {
+			int j = rand.nextInt(scene.getSceneGirls().length);
+			if(scene.getSceneGirls()[j].getGirlAlive() == true && girlAlreadyInScene(locationGirlsList,scene.getSceneGirls()[j].getGirlName())==false) {
+				locationGirlsList.add(scene.getSceneGirls()[j]);
+			}
+			if(locationGirlsList.toArray().length >= 20) {
+				break;
+			}
+		}		
+		return locationGirlsList;
+	}
+	
+	
+	
+	public static ArrayList<Girl> createGirlsInScene(Scene scene, boolean teachers){
+		Random rand = new Random();
+		ArrayList<Girl> girlsList = new ArrayList<Girl>(); 
+		ArrayList<Girl> sceneGirlsList = new ArrayList<Girl>(); 
+			for(int i = 0; i < scene.getSceneGirls().length; i++){
+				if(teachers == true) {
+					if(scene.getSceneGirls()[i].getGirlAlive() == true){
+						girlsList.add(scene.getSceneGirls()[i]);					
+					}
+				} else {
+					if(scene.getSceneGirls()[i].getGirlAlive() == true && scene.getSceneGirls()[i].getTeacher() == false) {
+						girlsList.add(scene.getSceneGirls()[i]);
+					}
+				}
+			}
+		int numberOfGirls = numberOfGirls(); 
+		for(int i = 0; i < numberOfGirls;i++) {
+			int j = rand.nextInt(girlsList.toArray().length);	
+					sceneGirlsList.add(girlsList.get(j));
+					scene.getDialogue().setIntroDialogue(girlsList.get(j), scene,j);
+					Dialogue.printDialogue(scene.getDialogue().getIntroDialogue());
+		}
+		listSceneGirls(sceneGirlsList);
+		return sceneGirlsList;
+	}
+	
+	//populates the scene with teachers
+	public static ArrayList<Girl> createTeachersInScene(Scene scene){
+		Random rand = new Random();
+		ArrayList<Girl> teachersList = new ArrayList<Girl>(); 
+		ArrayList<Girl> sceneGirlsList = new ArrayList<Girl>(); 
+		sceneGirlsList = scene.getGirlsInScene();
+			for(int i = 0; i < scene.getSceneGirls().length; i++){
+					if(scene.getSceneGirls()[i].getGirlAlive() == true && scene.getSceneGirls()[i].getTeacher() == true) {
+						teachersList.add(scene.getSceneGirls()[i]);
+					}
+			}
+		int numberOfGirls = numberOfTeachers(); 
+		for(int i = 0; i < numberOfGirls;i++) {
+			int j = rand.nextInt(teachersList.toArray().length);	
+					//System.out.printf(Dialogue.tabPadding(girlsList.get(j).getGirlName() + "\n",3));
+					sceneGirlsList.add(teachersList.get(j));
+		}
+		//listSceneGirls(sceneGirlsList);
+		return sceneGirlsList;
+	}
+	
+	//removes a specific girl from the scene (eating/running away)
+	//TODO
+	public static ArrayList<Girl> removeGirlFromScene(Scene scene, String girlName){
+		ArrayList<Girl> girlsList = new ArrayList<Girl>(); 
+		girlsList = scene.getGirlsInScene();
+		
+		for(int i = 0; i < girlsList.toArray().length; i++){
+			if(girlsList.get(i).getGirlDisplayName().toLowerCase().equals(girlName.toLowerCase())) {
+				girlsList.remove(i);
+				return girlsList;
+			}
+		}
+		return girlsList;
+	}
+	
+	//lists the girls that are in the scene
+	public static void listSceneGirls(ArrayList<Girl> arrList) {
+		if(arrList != null) {
+			System.out.printf("\n");	
+			printTabbedList(arrList,3,2);
+			System.out.printf("\n");
+		}
+	}
+	
+	
+	
+	
+	//calculates probability of number of girls showing
+	public static int numberOfGirls() {
+		Random rand = new Random();
+		int num = rand.nextInt(10);
+		switch(num) {
+		case 0: 
+		case 1:
+		case 2:
+		case 3: 
+		case 4: 
+		case 5:
+		case 6: return 1;
+		case 7: 
+		case 8: return 2;
+		case 9: return 3;
+		}
+		return num;
+	}
+	
+	//calculates probability of number of teachers showing
+	public static int numberOfTeachers() {
+		Random rand = new Random();
+		int num = rand.nextInt(10);
+		switch(num) {
+		case 0: 
+		case 1:
+		case 2:
+		case 3: 
+		case 4: 
+		case 5:
+		case 6: 
+		case 7:
+		case 8: return 1;
+		case 9: return 2;
+		}
+		return num;
+	}
+	
+	//checks if a girl is already in a scene, used to eliminate double-ups
+	public static boolean girlAlreadyInScene(ArrayList<Girl> arrList, String girlName){
+		for(int i = 0;i<arrList.toArray().length;i++) {
+				if(girlName.equals(arrList.get(i).getGirlName())) {
+					return true;
+				}
+		}
+		
+		return false;
+	}
+	
+	//================================================================================
+    // Adding victims
+    //================================================================================
+	
+	//adds a given victim to the player's collection, adds victim to green
+	public static void addVictimPlayer(Scene scene, String girlName) {	
+		for(int i = 0; i < scene.getSceneGirls().length; i++){
+			if(girlName.equals(scene.getSceneGirls()[i].getGirlDisplayName())) {
+				scene.getSceneGirls()[i].setGirlAlive(false);
+				scene.setGirlsEaten(scene.getGirlsEaten()+1);
+				scene.getSceneGirls()[i].setGirlEatenBy(scene.getScenePlayer().getPlayerName());
+				ArrayList<Girl> newVic =  new ArrayList<Girl>();
+				newVic = scene.getScenePlayer().getVictims();
+				newVic.add(scene.getSceneGirls()[i]);
+				scene.getScenePlayer().setVictims(newVic);
+					
+				//updating Green
+				ArrayList<Girl> newGreen =  new ArrayList<Girl>();
+				newGreen = scene.getGreen();
+				newGreen.add(scene.getSceneGirls()[i]);
+				scene.setGreen(newGreen);
+					
+				return;
+				
+			}
+		}
+	}
+	
+	//adds a given victim to a given predator in the girls[] array, adds victim to green
+	public static void addVictimGirl(Scene scene, int girlIndex, int predIndex) {
+		scene.getSceneGirls()[girlIndex].setGirlAlive(false);
+		scene.getSceneGirls()[girlIndex].setGirlEatenBy(scene.getSceneGirls()[predIndex].getGirlName());
+		
+		//updating victims
+		ArrayList<Girl> newVic =  new ArrayList<Girl>();
+		newVic = scene.getSceneGirls()[predIndex].getVictims();
+		newVic.add(scene.getSceneGirls()[girlIndex]);
+		scene.getSceneGirls()[predIndex].setVictims(newVic);
+		
+		//updating Green
+		ArrayList<Girl> newGreen =  new ArrayList<Girl>();
+		newGreen = scene.getGreen();
+		newGreen.add(scene.getSceneGirls()[girlIndex]);
+		scene.setGreen(newGreen);
+		
+		return;
+	}
+	
+	//================================================================================
+    // Star handlers
+    //================================================================================
+	
+	public static String convertStars(int numStars) {
+		String stars = "";
+		
+		switch(numStars) {
+		case 0: stars = "";
+				break;
+		case 1: stars = "*";
+				break;
+		case 2: stars = "**";
+				break;
+		case 3: stars = "***";
+				break;
+		case 4: stars = "****";
+				break;
+		case 5: stars = "*****";
+				break;
+		case 6: stars = "******";
+				break;
+		}
+		
+		return stars;
+	}	
+	
+	public static int findGirlStars(String girlName, Scene scene) {
+		for(int i = 0; i < scene.getSceneGirls().length; i++){
+			if(girlName.equals(scene.getSceneGirls()[i].getGirlName())) {
+				return scene.getSceneGirls()[i].getGirlStars();
+			}
+		}
+		return 0;
+	}
+	
+	public static void addGirlStars(String girlName, Scene scene) {
+		for(int i = 0; i < scene.getSceneGirls().length; i++){
+			if(girlName.equals(scene.getSceneGirls()[i].getGirlName())) {
+				scene.getSceneGirls()[i].setGirlStars(findGirlStars(girlName,scene)+1);		
+			}
+		}
+	}
+	
+	//================================================================================
+    // Window Functions
+    //================================================================================
+	
+	public static void rollWindow(Window window) {
+		Random rand = new Random();
+		int result = rand.nextInt(6)+1;
+		if(result>=5) {
+			window.setOpen(true);
+			int length = rand.nextInt(6)+1;
+			window.setTurns(length+2);
+			window.setTurnsLeft(window.getTurns());
+			System.out.printf("The halls become quiet . . . ");
+		}
+		window.setCaught(false);
+	}
+	
+	public static void manipulateWindowEating(String girlName, Scene scene) {
+		int turnsLeft = scene.getSceneWindow().getTurnsLeft()-1;
+		if(scene.getSceneWindow().getTurnsLeft() <= 0 && scene.getSceneWindow().getOpen() == true) {
+			Random rand = new Random();
+			int result = rand.nextInt(6)+1;
+			if(result<(result-findGirlStars(girlName, scene))) {
+			} else {
+				scene.getSceneWindow().setOpen(false);
+			}
+			scene.setSceneTurnClock(scene.getSceneTurnClock()+1);
+		} else if (scene.getSceneWindow().getTurnsLeft() > 0 && scene.getSceneWindow().getOpen() == true) {
+			scene.getSceneWindow().setTurnsLeft(turnsLeft);
+			scene.setSceneTurnClock(scene.getSceneTurnClock()+1);
+		}
+		//System.out.print("\n" + scene.getSceneWindow().getTurnsLeft() + " " + scene.getSceneTurnClock());
+		
+	}
+		
+		public static void manipulateWindowTransition(Scene scene, int timePassing) {
+			int turnsLeft = scene.getSceneWindow().getTurnsLeft()-1;
+			if(scene.getSceneWindow().getTurnsLeft() <= 0 && scene.getSceneWindow().getOpen() == true) {
+					scene.getSceneWindow().setOpen(false);
+			} else if (scene.getSceneWindow().getTurnsLeft() > 0 || scene.getSceneWindow().getOpen() == true) {
+				scene.getSceneWindow().setTurnsLeft(turnsLeft);
+			} else if ((scene.getSceneWindow().getTurnsLeft() <= 0 && scene.getSceneWindow().getOpen() == false)) {
+				Functions.rollWindow(scene.getSceneWindow());
+			}
+			scene.setSceneTurnClock(scene.getSceneTurnClock()+1);
+			//System.out.print("\n" + scene.getSceneWindow().getTurnsLeft() + " " + scene.getSceneTurnClock());
+		}
+	
+		public static void rollDice() {
+			Random rand = new Random();
+			for(int i=0;i<10;i++) {
+				int result = rand.nextInt(6)+1;
+				System.out.println(result);
+			}
+		}
+	
+	//================================================================================
+    // Scene over functions
+    //================================================================================
+		
+	public static void endScene(Scene scene) {
+		scene.setCaught(true);
+		System.out.println("\n\tYou finish for today.");
+	}
+	
+	public static void daysPassed(Scene scene) {
+		Random rand = new Random();
+		scene.getScenePlayer().setDays(scene.getScenePlayer().getDays() + rand.nextInt(10)+1);
+	}
+	
+	
+	
+	
+	
+	public static void daysInbetween(Scene scene) {
+		Random rand = new Random();
+		int num =  rand.nextInt(1);
+		switch (num) {
+		case 0: Dialogue.daysInBetween(num); if(pickRandomPred(scene) != -1 && pickRandomGirl(scene) != -1) { addVictimGirl(scene,pickRandomGirl(scene),pickRandomPred(scene)); };
+											break;
+		case 1: Dialogue.daysInBetween(num);break;
+		case 2: Dialogue.daysInBetween(num);break;
+		case 3: Dialogue.daysInBetween(num);break;
+		case 4: Dialogue.daysInBetween(num);break;
+		case 5: Dialogue.daysInBetween(num);break;
+		case 6: Dialogue.daysInBetween(num);break;
+		case 7: Dialogue.daysInBetween(num);break;
+		case 8: Dialogue.daysInBetween(num);break;
+		case 9: Dialogue.daysInBetween(num);break;
+		case 10: Dialogue.daysInBetween(num);break;
+		case 11: Dialogue.daysInBetween(num);break;
+		case 12: Dialogue.daysInBetween(num);break;
+		case 13: Dialogue.daysInBetween(num);break;
+		case 14: Dialogue.daysInBetween(num);break;
+		case 15: Dialogue.daysInBetween(num);break;
+		case 16: Dialogue.daysInBetween(num);break;
+		case 17: Dialogue.daysInBetween(num);break;
+		case 18: Dialogue.daysInBetween(num);break;
+		case 19: Dialogue.daysInBetween(num);break;
+		case 20: Dialogue.daysInBetween(num);break;
+		case 21: Dialogue.daysInBetween(num);break;
+		case 22: Dialogue.daysInBetween(num);break;
+		case 23: Dialogue.daysInBetween(num);break;
+		case 24: Dialogue.daysInBetween(num);break;
+			
+		}
+	}
+
+	//================================================================================
+    // Random girl pickers
+    //================================================================================
+	
+	public static int pickRandomGirl(Scene scene) {
+		Random rand = new Random();
+		boolean found = false;
+		while(found==false) {
+			int j = rand.nextInt(scene.getSceneGirls().length);
+				if(scene.getSceneGirls()[j].getGirlAlive() == true) {				
+					return j;
+				}
+		}
+		return -1;
+	}
+	
+	public static int pickRandomPred(Scene scene) {
+		Random rand = new Random();
+		boolean found = false;
+		while(found==false) {
+			int j = rand.nextInt(scene.getSceneGirls().length);
+			if(scene.getSceneGirls()[j].getGirlAlive() == true && scene.getSceneGirls()[j].getGirlPredator() == true) {				
+				return j;
+			}
+		}
+		return -1;
+	}
+	
+	//================================================================================
+    // Weight Gain Mode
+    //================================================================================
+	
+	//converts from cm to feet and inches
+	public static String metricToImperialHeight(double height) {
+		int feet = (int) (height*0.3937/12);
+		int inches = (int) (height*0.3937%12);
+		String conversion = feet + "'" + inches + "\"" ;
+		return conversion;
+	}
+	
+	//converts from kg to lbs
+	public static double metricToImperialWeight(double weight) {
+		return round(weight*2.2046,2);
+	}
+	
+	//rounds numbers to specified number of decimal places
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    long factor = (long) Math.pow(10, places);
+	    value = value * factor;
+	    long tmp = Math.round(value);
+	    return (double) tmp / factor;
+	}
+
+	//calculates weight gained based on girls eaten in a scene
+	//subtracts weight for days without scene
+	public static Scene gainWeight(Scene scene) {
+		int girlsEaten = scene.getGirlsEaten();
+		Random rand = new Random();
+		
+		scene.getScenePlayer().setPlayerLastWeight(scene.getScenePlayer().getPlayerWeight());
+		
+		for(int i = 0; i<girlsEaten; i++) {
+			scene.getScenePlayer().setPlayerWeight(scene.getScenePlayer().getPlayerWeight() + rand.nextInt(5)+4);
+		}
+		for(int i = 0; i<scene.getScenePlayer().getDays() - scene.getScenePlayer().getLastDay(); i++) {
+			scene.getScenePlayer().setPlayerWeight(scene.getScenePlayer().getPlayerWeight() - (rand.nextInt(4)+1)*0.25);
+		}
+		scene = changeBody(scene);
+		return scene;
+	}
+	
+	//changes the player's 'body type' on sufficient weight changes
+	public static Scene changeBody(Scene scene) {
+		
+		return scene;
+	}
+	
+}
