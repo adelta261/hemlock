@@ -4,6 +4,7 @@ cat
 persian
 maine coon
 russian blue
+tiger
 lynx
 cheetah
 cougar
